@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 502150080723033869}
   - component: {fileID: 502150080723033870}
   - component: {fileID: 502150080723033871}
-  - component: {fileID: 502150080723033864}
+  - component: {fileID: 1012239167503254866}
+  - component: {fileID: 3629979791794570661}
   - component: {fileID: 502150080723033868}
   - component: {fileID: 502150080723033875}
   m_Layer: 0
@@ -86,7 +87,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &502150080723033864
+--- !u!114 &1012239167503254866
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -95,24 +96,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 502150080723033860}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cf838678d7c7ac9429fb03bc8e807839, type: 3}
+  m_Script: {fileID: 11500000, guid: e720d320ecbf33f4d84deca2fab5e645, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _inputListener: {fileID: 0}
-  _RigidBody: {fileID: 0}
-  isGround: 0
-  GroundedOffset: -0.14
-  GroundedRadius: 0.28
-  GroundLayers:
-    serializedVersion: 2
-    m_Bits: 1024
-  JumpTimeout: 0.5
-  FallTimeout: 0.15
   speed: 3
-  speed_Float: 3
-  jumpForce: 5
-  rbom: {fileID: 0}
   ccom: {fileID: 502150080723033875}
+--- !u!114 &3629979791794570661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 502150080723033860}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629f6ff0c067d324aa63c3e0dd72ef36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!143 &502150080723033868
 CharacterController:
   m_ObjectHideFlags: 0
@@ -146,14 +147,16 @@ MonoBehaviour:
   moveInput: 0
   jumpInput: 0
   _ObritRadius: 11
-  _XSpeed: 5
-  _JumpForce: 5
-  isGround: 0
+  Speed: 7.8
+  JumpForce: 10
   Gravity: 9.8
   GroundOffset: 0.5
   GroundRadius: 0.5
-  GroundLayerMask:
-    serializedVersion: 2
-    m_Bits: 1024
+  _VectorX: 0
   HorizionalVelocityMax: 10
+  _VectorY: 0
   VerticalVelocityMax: 10
+  ceilingMask:
+    serializedVersion: 2
+    m_Bits: 0
+  ceilingCheckDistance: 0.1
