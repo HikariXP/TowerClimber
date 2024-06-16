@@ -28,7 +28,7 @@ public class PlatformObritMove : MonoBehaviour
     {
         var position = _transform.position;
         
-        var tempMovement = ObritMovementHelper.GetHorizontalMovement(position, speed, obritRadius, Time.deltaTime);
+        var tempMovement = ObritMovementHelper.GetHorizontalMovement(position, speed, obritRadius, Time.fixedDeltaTime);
         var tempRotation = ObritMovementHelper.GetQuaternionLockToTarget(position,Vector3.zero);
 
         _rigidbody.MovePosition(tempMovement);
