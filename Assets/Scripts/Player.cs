@@ -6,50 +6,84 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Module.EventManager;
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody),typeof(RigidBodyObritMove))]
 public class Player : MonoBehaviour
 {
     [SerializeField] 
     private ISListener _inputListener;
 
-    /// <summary>
-    /// 是否着地，会同时影响互动
-    /// </summary>
-    [Header("重力配置")]
-    public bool isGround;
-
-    private Transform GroundChecker;
-
-    private float airTime;
-
-    private float gravity = 9.8f;
+    private EventManager _battleEventManager;
 
     [Header("Player Ability")]
     public float speed = 3f;
 
-    // public float jumpForce = 10f;
-    [Header("Controller")]
-    public RigidBodyObritMove rbom;
+    public float JumpForce = 10f;
 
-    private void Update()
+    // 当玩家所在地方不是战局的时候，不执行
+    public bool canUseEnquie = true;
+
+    [Header("Controller")] private RigidBodyObritMove rbom;
+
+    [Header("Enquie")] private PlayerEnquieController pec;
+
+    public void Awake()
     {
-        // 更新信息给移动控制
-        rbom.moveInput = _inputListener.smoothMovement.x * speed;
-        // rbom.jumpInput = _inputListener.jump;
+        rbom = GetComponent<RigidBodyObritMove>();
+        pec = GetComponent<PlayerEnquieController>();
         
-        isGround = rbom.isGround;
-        UseEnquieCheck();
+        _battleEventManager = EventHelper.GetEventManager(EventManagerType.BattleEventManager);
+    }
+    
+    private void Start()
+    {
+        pec.Init(rbom);
+
+        _inputListener.jumpEvent += JumpInputCallBack;
+
+        _battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Register(ResetEnquie);
     }
 
-    private void UseEnquieCheck()
+    private void OnDestroy()
     {
-        // 地面没法使用道具
-        if(isGround) return;
+        _inputListener.jumpEvent -= JumpInputCallBack;
         
-        // 还没起跳，没法使用道具
-        // if (!_inputListener.jump)return;
+        _battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Unregister(ResetEnquie);
+    }
+
+    // TODO:重构。狗屎写法
+    private void Update()
+    {
+        if (rbom == null)
+        {
+            Debug.LogError($"[{nameof(Player_CharacterController)}]You are using a controller with nothing to control");
+            return;
+        }
         
-        Debug.Log("Use a Item");
+        // 传入输入
+        rbom.PlayerMove(_inputListener.smoothMovement.x * speed);
+        
+        
+    }
+
+    private void JumpInputCallBack()
+    {
+        //最好还是区分跳跃和道具。更符合主观以及出bug好查。
+        // 初次跳跃还有触地检查的短暂停止。触发跳跃后，会先关停地面检测
+        UseEnquie();
+    }
+
+    private void UseEnquie()
+    {
+        if(!canUseEnquie)return;
+
+        pec.Use();
+    }
+
+    private void ResetEnquie()
+    {
+        pec.ResetEnquieSort();
     }
 }

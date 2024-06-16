@@ -11,15 +11,15 @@ namespace Skill
     public interface IEnquie
     {
         /// <summary>
-        ///     用于初始化一些信息
+        /// 用于初始化一些信息
         /// </summary>
         /// <param name="player"></param>
-        public void Init(CharacterControllerObritMove moveComponent);
+        public void Init(RigidBodyObritMove moveComponent);
 
         /// <summary>
-        ///     使用接口,位置、矢量
+        /// 使用接口,位置、矢量
         /// </summary>
-        public void Use(Vector3 position, float vectorX, float vectorY);
+        public void Use(Vector3 position);
 
         /// <summary>
         /// 处理一些计时

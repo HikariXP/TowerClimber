@@ -12,10 +12,11 @@ GameObject:
   - component: {fileID: 3531804161256061688}
   - component: {fileID: 3531804161256061691}
   - component: {fileID: 3531804161256061572}
-  - component: {fileID: 3531804161256061571}
   - component: {fileID: 3531804161256061573}
-  - component: {fileID: 2019937340}
-  - component: {fileID: 2019937341}
+  - component: {fileID: 6431508461365513907}
+  - component: {fileID: 1340657611}
+  - component: {fileID: 1340657612}
+  - component: {fileID: 1340657613}
   m_Layer: 0
   m_Name: Player_RigidBody
   m_TagString: Untagged
@@ -66,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: 6e228169c4d511a4e973a88616a94fa5, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -101,48 +102,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _inputListener: {fileID: 0}
-  _radius: 11
-  isGround: 0
-  GroundedOffset: -0.14
-  GroundedRadius: 0.28
-  GroundLayers:
-    serializedVersion: 2
-    m_Bits: 1024
-  JumpTimeout: 0.5
-  FallTimeout: 0.15
-  speed: 3
-  speed_Float: 3
-  jumpForce: 5
-  rbom: {fileID: 3531804161256061571}
-  ccom: {fileID: 0}
---- !u!114 &3531804161256061571
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3531804161256061693}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c65f5f8bed901364e9882afdab4f0d33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveInput: 0
-  jumpInput: 0
-  _ObritRadius: 11
-  _JumpForce: 5
-  wallDetectionDistance: 2
-  wallCheckOffset: 0.5
-  isWallSliding: 0
-  isGround: 0
-  Gravity: 9.8
-  GroundOffset: 1
-  GroundRadius: 0.2
-  GroundLayerMask:
-    serializedVersion: 2
-    m_Bits: 1024
-  HorizionalVelocityMax: 10
-  VerticalVelocityMax: 10
+  speed: 5.8
+  JumpForce: 10
+  canUseEnquie: 1
 --- !u!54 &3531804161256061573
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -154,34 +116,82 @@ Rigidbody:
   m_Mass: 10
   m_Drag: 0
   m_AngularDrag: 0
-  m_UseGravity: 1
+  m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 3
---- !u!135 &2019937340
-SphereCollider:
+  m_CollisionDetection: 2
+--- !u!114 &6431508461365513907
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3531804161256061693}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.1
-  m_Center: {x: 0, y: -0.9, z: 0}
---- !u!135 &2019937341
-SphereCollider:
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82835b5be99e90f488c7bcdae25ab78c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  canInput: 1
+  moveInput: 0
+  jumpInput: 0
+  ObritRadius: 11
+  JumpForce: 10
+  wallDetectionDistance: 2
+  wallCheckOffset: 0.5
+  isWallSliding: 0
+  checkGounded: 1
+  isGround: 0
+  Gravity: 9.8
+  GroundOffset: 0.51
+  GroundRadius: 0.5
+  GroundLayerMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  ceilingMask:
+    serializedVersion: 2
+    m_Bits: 1024
+  ceilingCheckDistance: 0.1
+  HorizionalVelocityMax: 1
+  VerticalVelocityMax: 1
+--- !u!114 &1340657611
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3531804161256061693}
-  m_Material: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629f6ff0c067d324aa63c3e0dd72ef36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!136 &1340657612
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3531804161256061693}
+  m_Material: {fileID: 13400000, guid: 1c24226c06db0f640a0a82de4068f6ae, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.1
-  m_Center: {x: 0, y: 0.9, z: 0}
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!136 &1340657613
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3531804161256061693}
+  m_Material: {fileID: 13400000, guid: 1c24226c06db0f640a0a82de4068f6ae, type: 2}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.6
+  m_Height: 1.9
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}

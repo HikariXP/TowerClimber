@@ -6,38 +6,42 @@ using UnityEngine;
 
 public class Enquie_Return : IEnquie
 {
-    /// <summary>
-    /// TODO : 似乎可以优化为根据冷却去动态判断这个容量
-    /// </summary>
     private Queue<Vector3> _historyPosition;
+
+    private int _historyMaxCount;
 
     private float _timePass = 0f;
 
-    private float _recordCoolDown = 0.5f;
+    // 有一个很极致优化但不可视的优化：记录tick，比较int大小
+    private float _recordCoolDown = 0.2f;
 
     // 回到5秒前
-    private float _backTime = 5f;
+    private float _backTime = 3f;
 
-    private CharacterControllerObritMove ccom;
+    private RigidBodyObritMove rbom;
 
-    public void Init(CharacterControllerObritMove moveComponent)
+    public void Init(RigidBodyObritMove moveComponent)
     {
-        ccom = moveComponent;
+        rbom = moveComponent;
 
         var container = (int)Mathf.Floor(1 / _recordCoolDown * _backTime);
+        _historyMaxCount = container;
         _historyPosition = new Queue<Vector3>(container);
     }
 
-    public void Use(Vector3 position, float vectorX, float vectorY)
+    public void Use(Vector3 position)
     {
         if (_historyPosition.Count <= 0)
         {
             return;
         }
 
+        // 获取值，使用后清空历史
         var targetPosition = _historyPosition.Dequeue();
         _historyPosition.Clear();
-        ccom.transform.position = targetPosition;
+        
+        // 应用位置但不影响矢量
+        rbom.ForceTranslateTo(targetPosition);
     }
 
     public void Update(float deltaTime)
@@ -45,10 +49,18 @@ public class Enquie_Return : IEnquie
         _timePass += deltaTime;
         if (_timePass > _recordCoolDown)
         {
-            var position = ccom.transform.position;
+            var position = rbom.transform.position;
+
+            // 如果超出需要自己排掉第一个元素，否则会自动增加
+            if (_historyPosition.Count == _historyMaxCount)
+            {
+                // 丢弃掉第一个元素
+                _historyPosition.Dequeue();
+            }
+
             _historyPosition.Enqueue(position);
             _timePass = 0f;
-            Debug.Log($"[{nameof(Enquie_Return)}]Record:{position}");
+            // Debug.Log($"[{nameof(Enquie_Return)}]Record:{position}");
         }
     }
 

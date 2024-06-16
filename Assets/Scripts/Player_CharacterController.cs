@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Module.EventManager;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterControllerObritMove),typeof(PlayerEnquieController))]
@@ -8,6 +9,8 @@ public class Player_CharacterController : MonoBehaviour
 {
     [SerializeField] 
     private ISListener _inputListener;
+
+    private EventManager _battleEventManager;
     
     /// <summary>
     /// 原本方案使用一个中心去做旋转，现在废弃。
@@ -17,6 +20,8 @@ public class Player_CharacterController : MonoBehaviour
     
     [Header("Player Ability")]
     public float speed = 3f;
+
+    public float JumpForce = 10f;
 
     // 当玩家所在地方不是战局的时候，不执行
     public bool canUseEnquie = true;
@@ -29,51 +34,55 @@ public class Player_CharacterController : MonoBehaviour
     {
         ccom = GetComponent<CharacterControllerObritMove>();
         pec = GetComponent<PlayerEnquieController>();
+        
+        _battleEventManager = EventHelper.GetEventManager(EventManagerType.BattleEventManager);
     }
-
+    
     private void Start()
     {
-        pec.Init(ccom);
+        // pec.Init(ccom);
 
         _inputListener.jumpEvent += JumpInputCallBack;
+
+        _battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Register(ResetEnquie);
+    }
+
+    private void OnDestroy()
+    {
+        _inputListener.jumpEvent -= JumpInputCallBack;
+        
+        _battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Unregister(ResetEnquie);
     }
 
     // TODO:重构。狗屎写法
     private void Update()
     {
-        if (ccom != null)
+        if (ccom == null)
         {
-            ccom.moveInput = _inputListener.smoothMovement.x;
-
-            if (ccom.IsGround)
-            {
-                pec.ResetEnquieSort();
-            }
-
-            if (ccom.jumpInput)
-            {
-                UseEnquie();
-            }
+            Debug.LogError($"[{nameof(Player_CharacterController)}]You are using a controller with nothing to control");
+            return;
         }
+        
+        // 传入输入
+        ccom.PlayerMove(_inputListener.smoothMovement.x * speed);
+
+        // 弃用，用事件处理
+        // if (ccom.IsGround)
+        // {
+        //     pec.ResetEnquieSort();
+        // }
     }
 
     private void JumpInputCallBack()
     {
-        if (ccom.IsGround)
-        {
-            Jump();
-        }
-        else
-        {
-            UseEnquie();
-        }
+        UseEnquie();
     }
 
     // TODO:可以改成一个固定在第一位的装备。
+    // 且
     private void Jump()
     {
-        ccom._VectorY += 10f;
-        Debug.Log("Jump Player");
+        // ccom.PlayerJump(JumpForce);
     }
 
     private void UseEnquie()
@@ -81,5 +90,10 @@ public class Player_CharacterController : MonoBehaviour
         if(!canUseEnquie)return;
 
         pec.Use();
+    }
+
+    private void ResetEnquie()
+    {
+        pec.ResetEnquieSort();
     }
 }

@@ -8,27 +8,34 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using GamePlay.PhysicMove;
+using Module.EventManager;
+using Sirenix.OdinInspector;
 using UnityEngine;
 
+[Obsolete("之后全部内容使用RigidBody处理")]
 [RequireComponent(typeof(CharacterController))]
 public class CharacterControllerObritMove : MonoBehaviour
 { 
+    // TODO:将输入抽出，这个CCOM只处理输入后的移动内容。
+    
     /// <summary>
     /// X轴上的输入。
     /// </summary>
-    public float moveInput;
+    [ShowInInspector]
+    private float playerMoveInput;
 
-    public bool jumpInput;
+    /// <summary>
+    /// 来自环境的输入
+    /// </summary>
+    private float environmentMoveInput;
 
     private Transform _transform;
     
     private CharacterController _characterController;
 
-    public bool IsGround => _characterController.isGrounded;
-
+    private EventManager _battleEventManager;
+    
     /// <summary>
     /// 塔的半径
     /// </summary>
@@ -39,13 +46,15 @@ public class CharacterControllerObritMove : MonoBehaviour
     public float JumpForce = 10f;
 
     public bool listenInput = true;
-    
+
     [Header("着地信息")]
     public float Gravity;
 
     public float GroundOffset;
 
     public float GroundRadius;
+
+    public bool IsGround { get; private set; }
 
     /// <summary>
     /// 水平矢量
@@ -56,7 +65,7 @@ public class CharacterControllerObritMove : MonoBehaviour
     /// <summary>
     /// 绝对值
     /// </summary>
-    public float HorizionalVelocityMax = 1f;
+    public float HorizionalVelocityMax = 10f;
     
     /// <summary>
     /// 垂直矢量
@@ -66,39 +75,56 @@ public class CharacterControllerObritMove : MonoBehaviour
     /// <summary>
     /// 绝对值
     /// </summary>
-    public float VerticalVelocityMax = 1f;
+    public float VerticalVelocityMax = 10f;
     
     [Header("触顶处理")]
     public LayerMask ceilingMask;
     public float ceilingCheckDistance = 0.1f;
-    
+
+    // 强制移动相关
+    private bool _forceTranslateNextFixedUpdate = false;
+    private Vector3 _forceTranslatePosition = Vector3.zero;
+
+    [Header("Debug")] 
+    private Vector3 _moveDirection;
 
     private void Awake()
     {
         _characterController = GetComponent<CharacterController>();
         _transform = transform;
-    }
 
-    private void Update()
-    {
-        // 输入类型的Update检测
-        // JumpCheck();
+        _battleEventManager = EventHelper.GetEventManager(EventManagerType.BattleEventManager);
     }
 
     private void FixedUpdate()
     {
-        // 输入检测
-        // 测试用
-        if (listenInput && IsGround) _VectorX = moveInput * Speed;
+        if (listenInput && IsGround) _VectorX = playerMoveInput;
 
+        
+        // 强制跳转
+        if (_forceTranslateNextFixedUpdate)
+        {
+            ForceTranslate();
+            _forceTranslateNextFixedUpdate = false;
+            return;
+        }
+
+
+        // 重置环境矢量
+        environmentMoveInput = 0f;
+        
         // 矢量检查
         GravityCheck();
         // 头顶检测
         CheckCeilingCollision();
+        // 移动平台检测
+        CheckMobilePlatfrom();
+        
+        _VectorX += environmentMoveInput;
         
         // 最大矢量约束
         _VectorX = Math.Clamp(_VectorX, -HorizionalVelocityMax, HorizionalVelocityMax);
-        _VectorY = Math.Clamp(_VectorY, -HorizionalVelocityMax, HorizionalVelocityMax);
+        _VectorY = Math.Clamp(_VectorY, -VerticalVelocityMax, VerticalVelocityMax);
         
         Vector3 tempMovement = ObritMovementHelper.GetHorizontalMovement(_transform.position, _VectorX, _ObritRadius, Time.deltaTime);
         float tempVertical = GetVerticalMovement();
@@ -109,6 +135,8 @@ public class CharacterControllerObritMove : MonoBehaviour
         _characterController.Move(newLocalPosition);
     }
 
+
+
     /// <summary>
     /// 设置移动控制器的基础信息
     /// 塔的半径几乎不会随时变动，但是速度会。
@@ -117,6 +145,43 @@ public class CharacterControllerObritMove : MonoBehaviour
     public void SetupObritInfo(float radius)
     {
         _ObritRadius = radius;
+    }
+
+    /// <summary>
+    /// 只接收玩家的水平输入
+    /// </summary>
+    public void PlayerMove(float xInput)
+    {
+        playerMoveInput = xInput;
+    }
+
+    /// <summary>
+    /// 跳跃力度输入
+    /// </summary>
+    /// <param name="jumpForce"></param>
+    public void PlayerJump(float jumpForce)
+    {
+        _VectorY += jumpForce;
+    }
+
+    /// <summary>
+    /// 强制切换位置，此执行将会延时到下一次FixedUpdated的时候执行
+    /// </summary>
+    /// <param name="position"></param>
+    public void ForceTranslateTo(Vector3 position)
+    {
+        _forceTranslateNextFixedUpdate = true;
+        _forceTranslatePosition = position;
+    }
+
+    /// <summary>
+    /// fixdeUpdate里面运行
+    /// </summary>
+    private void ForceTranslate()
+    {
+        // 进行一次刷新
+        _forceTranslatePosition = ObritMovementHelper.GetPositionOnCircle(_forceTranslatePosition, _ObritRadius);
+        _characterController.transform.position = _forceTranslatePosition;
     }
 
     /// <summary>
@@ -134,14 +199,29 @@ public class CharacterControllerObritMove : MonoBehaviour
     void GravityCheck()
     {
         // 着地垂直矢量归 0
-        if (IsGround && _VectorY < 0f)
+        if (_characterController.isGrounded && _VectorY < 0f)
         {
+            if (IsGround == false)
+            {
+                _battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Notify();
+            }
+
+
             _VectorY = -0.1f;
+            IsGround = true;
+
             return;
+        }
+
+
+        if (IsGround)
+        {
+            _battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_END).Notify();
         }
 
         // 叠加垂直矢量，重力是垂直向下的，所以需要减
         _VectorY -= Gravity * Time.deltaTime;
+        IsGround = false;
     }
 
     float GetVerticalMovement()
@@ -165,6 +245,35 @@ public class CharacterControllerObritMove : MonoBehaviour
             }
         }
     }
+    
+    private void CheckMobilePlatfrom()
+    {
+        // Perform a raycast upwards from the character
+        if (Physics.Raycast(transform.position, Vector3.down, out var hit, _characterController.height / 2 + ceilingCheckDistance, ceilingMask))
+        {
+            if (hit.collider.CompareTag("MovePlatform") && IsGround)
+            {
+                // 这种情况没办法处理自行转动的内容
+                environmentMoveInput = hit.transform.GetComponent<PlatformObritMove>().speed;
+            }
+        }
+    }
+
+    // 比起被动的检测，对于跟随这种，不如主动发出射线检测
+    private void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        _moveDirection = hit.moveDirection;
+
+        if (_moveDirection.y == 0)
+        {
+            _VectorX = 0f;
+        }
+        //
+        // if(hit.collider.CompareTag("MovePlatform") || IsGround)
+        // {
+        //     environmentMoveInput = hit.gameObject.GetComponent<PlatformObritMove>().speed;
+        // }
+    }
 
     #region Debug - Gizmos
 
@@ -178,6 +287,7 @@ public class CharacterControllerObritMove : MonoBehaviour
         if (Application.isPlaying)
         {
             DrawOnPlaying();
+            DrawMoveDirection();
         }
     }
 
@@ -192,48 +302,10 @@ public class CharacterControllerObritMove : MonoBehaviour
         Gizmos.DrawRay(transform.position,new Vector3(0,_characterController.height / 2 + ceilingCheckDistance,0));
     }
 
-    #endregion
-    
-
-    #region 实验代码
-    
-    void MoveCircle(float speed, Transform transform, float radius, float deltaTime)
+    private void DrawMoveDirection()
     {
-        // 计算弧长
-        float distanceToMove = speed * deltaTime;
-
-        // 计算弧度
-        float angleToMove = distanceToMove / radius;
-
-        // 计算新的位置
-        Vector3 currentPosition = transform.position;
-        float currentAngle = Mathf.Atan2(currentPosition.z, currentPosition.x);
-        float newAngle = currentAngle + angleToMove;
-
-        // 以新的角度计算新的位置
-        float newX = radius * Mathf.Cos(newAngle);
-        float newZ = radius * Mathf.Sin(newAngle);
-        Vector3 newPosition = new Vector3(newX, currentPosition.y, newZ);
-
-        // 更新Transform的位置
-        transform.position = newPosition;
+        Gizmos.DrawRay(transform.position,_moveDirection * 3);
     }
-    
-    private void GroundedCheck()
-    {
-        bool Grounded;
-        float GroundedRadius = 1f;
-        LayerMask GroundLayers = LayerMask.GetMask("123");
-        float GroundedOffset = 1f;
-        
-        // set sphere position, with offset
-        Vector3 spherePosition = new Vector3(transform.position.x, transform.position.y - GroundedOffset,
-            transform.position.z);
-        
-        Grounded = Physics.CheckSphere(spherePosition, GroundedRadius, GroundLayers,
-            QueryTriggerInteraction.Ignore);
-    }
-    
+
     #endregion
-    
 }

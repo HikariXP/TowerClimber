@@ -28,14 +28,14 @@ namespace Skill
         #endregion
 
         // 记得去思考怎么修正这个方案，理论上道具不应该控制ccom，而是应该告诉他让他去做而已。
-        private CharacterControllerObritMove ccomCache;
+        private RigidBodyObritMove rbom;
         
-        public void Init(CharacterControllerObritMove moveComponent)
+        public void Init(RigidBodyObritMove moveComponent)
         {
-            ccomCache = moveComponent;
+            rbom = moveComponent;
         }
 
-        public void Use(Vector3 position, float vectorX, float vectorY)
+        public void Use(Vector3 position)
         {
             if(_timeRemain > 0) return;
 
@@ -49,16 +49,20 @@ namespace Skill
         {
             if (_timeRemain < _minCheckTime) return;
 
-            ccomCache.listenInput = false;
-            ccomCache._VectorY = 0;
-            ccomCache._VectorX = ccomCache._VectorX > 0f ? 30f : -30f;
+            rbom.canInput = false;
+            // rbom._VectorY = 0;
+            // rbom._VectorX = rbom._VectorX > 0f ? 30f : -30f;
+            
+            // TODO:这里会有大量新建的GC，需要关注一下
+            var flashVectorX = rbom.GetVelocity().x > 0f ? 10f : -10f;
+            rbom.SetVelocity(new Vector2(flashVectorX,0));
             
             _timeRemain -= deltaTime;
 
             if (_timeRemain < _minCheckTime)
             {
                 isActivity = false;
-                ccomCache.listenInput = true;
+                rbom.canInput = true;
             }
         }
 
