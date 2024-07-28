@@ -47,7 +47,7 @@ namespace GamePlay.PhysicMove
                 // 可以设置一个阈值来判断是否大致垂直，例如0.9或更高。
                 if (Mathf.Abs(Vector3.Dot(normal, Vector3.up)) > 0.9f)
                 {
-                    var rbom = contact.otherCollider.GetComponent<RigidBodyObritMove>();
+                    var rbom = contact.otherCollider.GetComponent<RigidBodyOrbitMove>();
                     if(!rbom)return;
                 
                     rbom.SetEnvironmentVelocity(-Vector2.right * speed);
@@ -57,12 +57,6 @@ namespace GamePlay.PhysicMove
                     Debug.Log("碰撞法线非垂直");
                 }
             }
-
-            // 旧方案对垂直无效，且对于水平碰撞的时候，玩家会被弹飞。
-            // var rbom = collisionInfo.body.GetComponent<RigidBodyObritMove>();
-            // var temp = rbom.GetVelocity();
-            // temp.x += speed;
-            // rbom.SetVelocity(temp);
         }
     }
 }

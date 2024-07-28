@@ -1,0 +1,27 @@
+// Json是不支持注释，但在数据结构外是可以写注释的
+// key:多语言key:role_rolename_dialog_progress_context
+// text:多语言文案
+// text_eng:多语言描述
+
+[
+    {
+        "key" : "role_lalako_dialog_0_0",
+        "text" : "你好~我是拉拉可~",
+        "text_eng" : "Lalako:Hello~I'm Lalako~"
+    },
+    {
+        "key" : "role_lalako_dialog_0_1",
+        "text" : "你好",
+        "text_eng" : "Player:Hello"
+    },
+    {
+        "key" : "role_lalako_dialog_0_2",
+        "text" : "你在这里做什么？",
+        "text_eng" : "Player:What are you doing here?"
+    },    
+    {
+        "key" : "role_lalako_dialog_1_0",
+        "text" : "让我思考一下...",
+        "text_eng" : "Lalako:Let me think..."
+    }
+]

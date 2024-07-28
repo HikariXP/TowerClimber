@@ -1,0 +1,40 @@
+// Json是不支持注释，但在数据结构外是可以写注释的
+// key:多语言key:role_rolename_dialog_progress_context
+// text:多语言文案
+// text_eng:多语言描述
+
+// 拉拉可的id是1，0是主角，留着给主角自言自语
+// 虽然json读取的index是有序的，但为了准确性，依然加上了后缀index
+[
+    {
+        "progress": 0,
+        "dialog_summary": "初次遇到拉拉可",
+        "dialog_context":
+                [
+                    {
+                        "role_index": 1,
+                        "dialog_key": "role_lalako_dialog_0_0"
+                    },
+                    {
+                        "role_index": 0,
+                        "dialog_key": "role_lalako_dialog_0_1"
+                    },
+                    {
+                        "role_index": 0,
+                        "dialog_key": "role_lalako_dialog_0_2"
+                    }
+                ]
+    },
+    {
+        "progress": 1,
+        "dialog_summary": "闲聊等待",
+        "dialog_context":
+        [
+            {
+                "role_index": 1,
+                "dialog_key": "role_lalako_dialog_1_0"
+            }
+        ]
+    }
+]
+

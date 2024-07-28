@@ -254,7 +254,7 @@ public class CharacterControllerObritMove : MonoBehaviour
             if (hit.collider.CompareTag("MovePlatform") && IsGround)
             {
                 // 这种情况没办法处理自行转动的内容
-                environmentMoveInput = hit.transform.GetComponent<PlatformObritMove>().speed;
+                environmentMoveInput = hit.transform.GetComponent<PlatformOrbitMove>().speed;
             }
         }
     }

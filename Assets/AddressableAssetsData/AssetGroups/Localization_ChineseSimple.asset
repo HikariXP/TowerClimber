@@ -1,0 +1,37 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Localization_ChineseSimple
+  m_EditorClassIdentifier: 
+  m_GroupName: Localization_ChineseSimple
+  m_Data:
+    m_SerializedData: []
+  m_GUID: dd4a5fa298d94454691061c8c978c4f6
+  m_SerializeEntries:
+  - m_GUID: 4daf18e11ee691b429b4fc4a91348e0e
+    m_Address: role_lalako_ChineseSimple
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2710dd7eada5b5247a1cfd21534cf19d
+    m_Address: loot_ChineseSimple
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4d907179fb747584aa7a44507944b5a2
+    m_Address: base_ui_ChineseSimple
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 4919142bcbccf8d45bed3326f6ec0d44, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: abbbe52437c72224b969509828ae5aed, type: 2}
+    - {fileID: 11400000, guid: 11706d48d020ee644988c4f24ca1c556, type: 2}

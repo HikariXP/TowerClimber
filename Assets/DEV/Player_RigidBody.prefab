@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 3531804161256061688}
   - component: {fileID: 3531804161256061691}
   - component: {fileID: 3531804161256061572}
-  - component: {fileID: 3531804161256061573}
-  - component: {fileID: 6431508461365513907}
   - component: {fileID: 1340657611}
+  - component: {fileID: 9004496147160099328}
+  - component: {fileID: 6431508461365513907}
+  - component: {fileID: 3531804161256061573}
   - component: {fileID: 1340657612}
   - component: {fileID: 1340657613}
   m_Layer: 0
@@ -105,22 +106,30 @@ MonoBehaviour:
   speed: 5.8
   JumpForce: 10
   canUseEnquie: 1
---- !u!54 &3531804161256061573
-Rigidbody:
+--- !u!114 &1340657611
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3531804161256061693}
-  serializedVersion: 2
-  m_Mass: 10
-  m_Drag: 0
-  m_AngularDrag: 0
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 2
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 629f6ff0c067d324aa63c3e0dd72ef36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &9004496147160099328
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3531804161256061693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d11751344bd3e1d4f8d955a5b001f87a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6431508461365513907
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -133,10 +142,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82835b5be99e90f488c7bcdae25ab78c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  canInput: 1
+  isActive: 1
+  listenInput: 1
   moveInput: 0
   jumpInput: 0
-  ObritRadius: 11
+  OrbitRadius: 0
   JumpForce: 10
   wallDetectionDistance: 2
   wallCheckOffset: 0.5
@@ -155,18 +165,22 @@ MonoBehaviour:
   ceilingCheckDistance: 0.1
   HorizionalVelocityMax: 1
   VerticalVelocityMax: 1
---- !u!114 &1340657611
-MonoBehaviour:
+--- !u!54 &3531804161256061573
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3531804161256061693}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 629f6ff0c067d324aa63c3e0dd72ef36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  serializedVersion: 2
+  m_Mass: 10
+  m_Drag: 0
+  m_AngularDrag: 0
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 112
+  m_CollisionDetection: 2
 --- !u!136 &1340657612
 CapsuleCollider:
   m_ObjectHideFlags: 0

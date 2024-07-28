@@ -3,6 +3,7 @@
  * Created On: 2024.06.11
  * Description: 全局唯一物理逻辑处理管理
  * TODO:此举将重写整个物理处理逻辑。工作量会增加。好处是FixedUpdate的顺序将是可控的。
+ * 同时也充当IPause的用处
  */
 
 using System.Collections.Generic;

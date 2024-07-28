@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Config
+  m_EditorClassIdentifier: 
+  m_GroupName: Config
+  m_Data:
+    m_SerializedData: []
+  m_GUID: 609367a9373da8e4b9915fad831c0c41
+  m_SerializeEntries:
+  - m_GUID: 7feaa7b176bfed74194642549dea0bb7
+    m_Address: lalako_dialog
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 4919142bcbccf8d45bed3326f6ec0d44, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: da10e84785a6e8f40b979abe149c4a17, type: 2}
+    - {fileID: 11400000, guid: 1f04b67dd551a404c9521a54b7a0aa09, type: 2}

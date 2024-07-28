@@ -1,0 +1,17 @@
+// Json是不支持注释，但在数据结构外是可以写注释的
+// key:多语言key:
+// text:多语言文案
+// text_eng:多语言描述
+
+[
+    {
+        "key" : "button_Yes",
+        "text" : "是的",
+        "text_eng" : "yes"
+    },
+    {
+        "key" : "button_No",
+        "text" : "不是",
+        "text_eng" : "no"
+    }
+]

@@ -12,6 +12,7 @@ namespace Module.EventManager
     public enum EventManagerType
     {
         BattleEventManager = 0,
+        UIEventManager = 1,
     }
 
     public static class EventHelper
