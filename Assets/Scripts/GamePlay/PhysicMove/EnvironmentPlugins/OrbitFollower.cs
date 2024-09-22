@@ -49,11 +49,11 @@ public class OrbitFollower : MonoBehaviour
 
         // 位置跟随
         StartPosition = new Vector3(StartPosition.x, position.y, StartPosition.z);
-        transform.position = ObritMovementHelper.GetExtendedPoint(StartPosition, position,distance);
+        transform.position = OrbitMovementHelper.GetExtendedPoint(StartPosition, position,distance);
 
         if (FollowRotate)
         {
-            transform.rotation = ObritMovementHelper.GetQuaternionLockToTarget(position,Vector3.zero);
+            transform.rotation = OrbitMovementHelper.GetQuaternionLockToTarget(position,Vector3.zero);
         }
     }
     

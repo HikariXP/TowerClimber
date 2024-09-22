@@ -4,10 +4,12 @@
  * Description: 
  */
 
+using System;
 using UnityEngine;
 
 namespace Config.ScriptableObject
 {
+    [Obsolete("新的替换为TowerTeleportInfo")]
     [CreateAssetMenu(menuName= "TC_Config/TowerTranslate",fileName = "NewTowerTranslate",order = 0)]
     public class TowerTranslateScriptableObject : UnityEngine.ScriptableObject
     {
@@ -22,6 +24,8 @@ namespace Config.ScriptableObject
         /// <summary>
         /// 下一座塔的ID，如果是-1则不传送
         /// </summary>
-        public int nextTower;
+        public int nextTowerIndex;
+
+        public int nextSpawnPointIndex;
     }
 }

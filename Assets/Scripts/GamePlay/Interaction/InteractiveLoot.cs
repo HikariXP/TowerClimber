@@ -22,7 +22,7 @@ public class InteractiveLoot : IInteractiveUnit
         base.Init(newPriority);
     }
 
-    public override void Interact()
+    public override void Interact(RigidBodyOrbitMove _)
     {
         if(!CanInteract())return;
         

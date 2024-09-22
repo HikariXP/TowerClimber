@@ -2,6 +2,7 @@
  * Author: CharSui
  * Created On: 2024.05.20
  * Description: 这种计算会涉及极坐标的计算。
+ * TODO：之后改成指定的按键触发对应的技能。
  */
 using System;
 using System.Collections;
@@ -14,8 +15,6 @@ public class Player : MonoBehaviour
 {
     [SerializeField] 
     private ISListener _inputListener;
-
-    private EventManager _battleEventManager;
 
     [Header("Player Ability")]
     public float speed = 3f;
@@ -31,30 +30,17 @@ public class Player : MonoBehaviour
 
     [Header("Interact")] private PlayerInteractor pi;
 
-
-    public void Awake()
-    {
-        rbom = GetComponent<RigidBodyOrbitMove>();
-        pec = GetComponent<PlayerEnquieController>();
-        pi = GetComponent<PlayerInteractor>();
-        
-        _battleEventManager = EventHelper.GetEventManager(EventManagerType.BattleEventManager);
-    }
-    
     private void Start()
     {
-        pec.Init(rbom);
 
-        _inputListener.jumpEvent += JumpInputCallBack;
-
-        _battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Register(ResetEnquie);
     }
 
     private void OnDestroy()
     {
         _inputListener.jumpEvent -= JumpInputCallBack;
         
-        _battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Unregister(ResetEnquie);
+        var battleEventManager = EventHelper.GetEventManager(EventManagerType.BattleEventManager);
+        battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Unregister(ResetEnquie);
     }
 
     // TODO:重构。狗屎写法
@@ -68,8 +54,50 @@ public class Player : MonoBehaviour
         
         // 传入输入
         rbom.PlayerMove(_inputListener.smoothMovement.x * speed);
+    }
+
+    public void Initialize()
+    {
+        rbom = GetComponent<RigidBodyOrbitMove>();
+        pec = GetComponent<PlayerEnquieController>();
+        pi = GetComponent<PlayerInteractor>();
+        
+        pec.Init(rbom);
         
         
+        var battleEventManager = EventHelper.GetEventManager(EventManagerType.BattleEventManager);
+        battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Register(ResetEnquie);
+    }
+
+    /// <summary>
+    /// 注册控制器
+    /// </summary>
+    public void RegisterInputListener(ISListener listener)
+    {
+        if (listener == null)
+        {
+            Debug.LogError($"[{nameof(Player)}]You are trying to register a null inputListener");
+            return;
+        }
+
+        // 如果已存在控制器，则先注销
+        if (_inputListener != null)
+        {
+            UnregisterInputListener();
+        }
+
+        _inputListener = listener;
+        _inputListener.jumpEvent += JumpInputCallBack;
+    }
+
+    /// <summary>
+    /// 注销当前正在使用的控制器
+    /// </summary>
+    public void UnregisterInputListener()
+    {
+        if(_inputListener == null) return;
+        
+        _inputListener.jumpEvent -= JumpInputCallBack;
     }
 
     private void JumpInputCallBack()
@@ -92,15 +120,6 @@ public class Player : MonoBehaviour
     {
         return pi.TryInteract();
     }
-    
-    /// <summary>
-    /// 触发跳跃
-    /// </summary>
-    /// <returns></returns>
-    // private bool Jump()
-    // {
-    //     
-    // }
 
     /// <summary>
     /// 触发道具的使用

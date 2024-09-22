@@ -8,11 +8,11 @@ using System;
 
 public class InteractiveElevator : IInteractiveUnit
 {
-    public override void Interact()
+    public override void Interact(RigidBodyOrbitMove targetObject)
     {
-        // 后续有一些是动画控制的，需要自己复写动画控制器。
+        
     }
-
+    
     /// <summary>
     /// 刚开始互动
     /// </summary>

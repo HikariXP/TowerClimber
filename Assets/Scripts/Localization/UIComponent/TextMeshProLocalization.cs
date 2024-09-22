@@ -11,6 +11,7 @@ namespace Localization
     [RequireComponent(typeof(TextMeshProUGUI))]
     public class TextMeshProLocalization : UILocalizationBase
     {
+        [SerializeField]
         private TextMeshProUGUI _textMeshProUGUI;
 
         protected override void Init()
@@ -21,6 +22,11 @@ namespace Localization
 
         protected override void RefreshLocalization(string localizationText)
         {
+            if (_textMeshProUGUI == null)
+            {
+                _textMeshProUGUI = GetComponent<TextMeshProUGUI>();
+            }
+
             _textMeshProUGUI.text = localizationText;
         }
     }

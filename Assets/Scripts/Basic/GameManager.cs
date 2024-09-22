@@ -8,10 +8,13 @@ using System.Collections;
 using DataBase;
 using Dialog;
 using Localization;
+using Module.EventManager;
 using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
+    public BattleEnvironmentManager bem;
+    
     /// <summary>
     /// 执行顺序放到最前，有必要的话去ProjectSetting里面调整ScriptOrder
     /// </summary>
@@ -50,9 +53,11 @@ public class GameManager : MonoBehaviour
         
         new DatabaseManager().Init();
 
-        new DialogManager();
-        
+        // new DialogManager();
+
         Debug.Log($"[{nameof(GameManager)}]Init Finish");
+        
+        bem.DEV_Teleport(0);
     }
     
     

@@ -5,6 +5,7 @@
  * 毕竟每种内容的触发效果都不一样
  */
 
+using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -13,8 +14,18 @@ public class PlayerInteractor : MonoBehaviour
 {
     private const string tag_interactive = "Interactive";
 
+    private RigidBodyOrbitMove playerMoveComponent;
+
     [ShowInInspector]
     private readonly List<IInteractiveUnit> _unitCanInteract = new(8);
+
+    private void Awake()
+    {
+        if (playerMoveComponent == null)
+        {
+            playerMoveComponent = GetComponent<RigidBodyOrbitMove>();
+        }
+    }
 
     //看情况如果需要转换模式：由可互动内容去告知玩家可互动，可以将此改为Public供其调用
     private void AddUnit(IInteractiveUnit unit)
@@ -32,7 +43,8 @@ public class PlayerInteractor : MonoBehaviour
         if (_unitCanInteract.Count == 0) return false;
 
         var unit = _unitCanInteract[0];
-        unit.Interact();
+
+        unit.Interact(playerMoveComponent);
         _unitCanInteract.Remove(unit);
         return true;
     }
@@ -45,10 +57,12 @@ public class PlayerInteractor : MonoBehaviour
 
         var interactiveUnit = other.GetComponentInParent<IInteractiveUnit>();
 
+        if(interactiveUnit == null) return;
+        
         // 如果自动触发的，在玩家进入就自动触发，且不算入可互动列表
         if (interactiveUnit.autoInteract)
         {
-            interactiveUnit.Interact();
+            interactiveUnit.Interact(playerMoveComponent);
             return;
         }
 

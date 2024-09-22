@@ -7,7 +7,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using Basic.Defines;
 using Dialog;
 using Newtonsoft.Json;
@@ -53,7 +52,7 @@ namespace DataBase
         }
 
         /// <summary>
-        ///     覆写初始化
+        /// 覆写初始化
         /// </summary>
         /// <param name="jsonData"></param>
         protected override void DeserializeOverride(string jsonData)

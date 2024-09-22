@@ -3,8 +3,11 @@
  * Created On: 2024.06.23
  * Description: 玩家存档管理
  */
+
+using System;
 using UnityEngine;
 
+[Obsolete("正式需要使用之前，直接使用PlayerPref")]
 public class PlayerSave
 {
      // TODO:做成可以适配手机的。也就是支持多种保存方式的。
@@ -25,6 +28,7 @@ public class PlayerSave
      
      public void Load()
      {
+         
          // 没有这个函数，PlayerPrefs在进入游戏的时候自动初始化
          // PlayerPrefs.Load();
      }

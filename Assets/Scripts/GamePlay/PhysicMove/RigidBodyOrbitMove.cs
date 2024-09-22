@@ -6,18 +6,19 @@
  */
 
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using GamePlay.PhysicMove;
 using Module.EventManager;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-public class RigidBodyOrbitMove : MonoBehaviour
+public class RigidBodyOrbitMove : MonoBehaviour, IPause
 {
     private EventManager _battleEventManager;
     
     private Rigidbody _rigidBody;
+
+    [SerializeField]
+    private Transform _characterTransform;
     
     /// <summary>
     /// 取消激活就应用任何物理，交由其他组件控制
@@ -27,6 +28,8 @@ public class RigidBodyOrbitMove : MonoBehaviour
     
     [ReadOnly]
     public bool listenInput = true;
+
+    public bool isInRoom = false;
     
     /// <summary>
     /// X轴上的输入。
@@ -41,6 +44,11 @@ public class RigidBodyOrbitMove : MonoBehaviour
     public float OrbitRadius;
     
     public float JumpForce = 5f;
+    
+    /// <summary>
+    /// 角色朝向旋转速度
+    /// </summary>
+    public float directionRotationSpeed = 5f;
 
     /// <summary>
     /// 碰墙检测距离
@@ -54,15 +62,18 @@ public class RigidBodyOrbitMove : MonoBehaviour
     /// 是否正在滑墙
     /// </summary>
     public bool isWallSliding = false;
-
-
-
+    
     [Header("着地信息")] 
     public bool checkGounded = true;
     
     public bool isGround;
 
+    /// <summary>
+    /// TODO:改为曲线控制
+    /// </summary>
     public float Gravity = 9.8f;
+
+    public AnimationCurve gravityCurve;
 
     public float GroundOffset;
 
@@ -81,7 +92,7 @@ public class RigidBodyOrbitMove : MonoBehaviour
     private Vector3 _forceTranslatePosition = Vector3.zero;
     
     [ShowInInspector]
-    private Vector2 _velocity;
+    private Vector2 _moveVelocity;
 
     /// <summary>
     /// 环境矢量，通常由传送带，或者风场造成
@@ -91,33 +102,43 @@ public class RigidBodyOrbitMove : MonoBehaviour
     private Vector2 _environmentVelocity;
     
     /// <summary>
-    /// 绝对值
+    /// 最终矢量的最大绝对值
     /// </summary>
-    public float HorizionalVelocityMax = 1f;
+    public float HorizionalVelocityMax = 10f;
     
     /// <summary>
-    /// 绝对值
+    /// 最终矢量的最大绝对值
     /// </summary>
-    public float VerticalVelocityMax = 1f;
-
-    public void Start()
-    {
-        // Time.timeScale = 0.3f;
-    }
+    public float VerticalVelocityMax = 5f;
 
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();
-
         _battleEventManager = EventHelper.GetEventManager(EventManagerType.BattleEventManager);
+        
+        // 测试由动画曲线获取重力的方法，如果超Key则获取最近的值
+        // Debug.Log(gravityCurve.Evaluate(-1f));
     }
 
-    private void FixedUpdate()
+    public void ControlledUpdate(float deltaTime)
     {
         if(!isActive) return;
+        if(deltaTime < 0.0001f) return;
+        if (OrbitRadius <= 0) return;
         // 这里不处理，就没办法做到平台移动。
-        if (listenInput && isGround) _velocity.x = moveInput;
-        
+        if (listenInput && isGround) _moveVelocity.x = moveInput;
+
+        if (Math.Abs(moveInput) > 0.1f)
+        {
+            if (moveInput > 0)
+            {
+                if (isInRoom)
+                {
+                    
+                }
+            }
+        }
+
         // ========================================= 前处理
         
         // 强制跳转
@@ -135,17 +156,48 @@ public class RigidBodyOrbitMove : MonoBehaviour
 
         // 需要自己计算重力
         GravityCheck(fixedDeltaTime);
-        JumpCheck();
+        // 改为重力曲线
+        // GravityCurveCheck(fixedDeltaTime, _moveVelocity.y);
+        
+        JumpCheck(); 
         CheckCeilingCollision();
 
-        var finalVelocity = _environmentVelocity + _velocity;
+        // 如果在室内，水平矢量反转
+        // TODO:做到获取获取水平移动上？感觉不太好
+        var finalVelocity = _environmentVelocity + _moveVelocity;
+
+        Vector2LimitCheck(ref finalVelocity, HorizionalVelocityMax, VerticalVelocityMax);
+        
+        
+        // 角色旋转代码
+        // 移动输入大于0.1的时候旋转角色
+        if (Mathf.Abs(_moveVelocity.x) > 0.1f)
+        {
+            Debug.Log("Running");
+            var v2 = _rigidBody.velocity;
+            if (v2 != Vector3.zero)
+            {
+                Vector3 horizontalVelocity = new Vector3(v2.x, 0, v2.z);
+                Vector3 direction = horizontalVelocity.normalized;
+                Quaternion q = Quaternion.LookRotation(direction);
+                _characterTransform.rotation = q;
+            }
+        }
+        
+        if (isInRoom)
+        {
+            var reverseXVelocity = new Vector2(-finalVelocity.x, finalVelocity.y);
+            finalVelocity = reverseXVelocity;
+        }
+
+        
 
         Vector3 position = _rigidBody.position;
 
 
         // ========================================= 速度计算
         // 计算水平移动的新位置
-        Vector3 originHorizontalMovement = ObritMovementHelper.GetHorizontalMovement(position, finalVelocity.x, OrbitRadius, fixedDeltaTime);
+        Vector3 originHorizontalMovement = OrbitMovementHelper.GetHorizontalMovement(position, finalVelocity.x, OrbitRadius, fixedDeltaTime);
 
         // 计算新的Y轴位置
         float y = position.y + finalVelocity.y * fixedDeltaTime;
@@ -178,9 +230,9 @@ public class RigidBodyOrbitMove : MonoBehaviour
         // Perform a raycast upwards from the character
         if (Physics.Raycast(transform.position, Vector3.up, out var hit, 1 + ceilingCheckDistance, ceilingMask))
         {
-            if (_velocity.y > 0)
+            if (_moveVelocity.y > 0)
             {
-                _velocity.y = 0;
+                _moveVelocity.y = 0;
             }
         }
     }
@@ -233,7 +285,7 @@ public class RigidBodyOrbitMove : MonoBehaviour
     private void ForceTranslate()
     {
         // 进行一次刷新
-        _forceTranslatePosition = ObritMovementHelper.GetPositionOnCircle(_forceTranslatePosition, OrbitRadius);
+        _forceTranslatePosition = OrbitMovementHelper.GetPositionOnCircle(_forceTranslatePosition, OrbitRadius);
         _rigidBody.MovePosition(_forceTranslatePosition);
     }
 
@@ -257,7 +309,7 @@ public class RigidBodyOrbitMove : MonoBehaviour
         {
             _battleEventManager.TryGetNoArgEvent(BattleEventDefine.PLAYER_GROUNDED_START).Notify();
             _environmentVelocity = Vector2.zero;
-            _velocity.y = 0;
+            _moveVelocity.y = 0;
         }
 
         
@@ -266,19 +318,28 @@ public class RigidBodyOrbitMove : MonoBehaviour
     }
 
     /// <summary>
-    /// 重力计算
+    /// 固定重力计算
     /// </summary>
     void GravityCheck(float deltaTime)
     {
-        // 着地垂直矢量归 0
-        if (isGround)
-        {
-            // _velocityY = 0f;
-            return;
-        }
+        if (isGround) return;
 
         // 叠加垂直矢量，重力是垂直向下的，所以需要减
-        _velocity.y -= Gravity * deltaTime;
+        _moveVelocity.y -= Gravity * deltaTime;
+    }
+    
+    /// <summary>
+    /// 重力曲线计算
+    /// </summary>
+    /// <param name="deltaTime"></param>
+    void GravityCurveCheck(float deltaTime, float verticalVelocity)
+    {
+        if (isGround) return;
+
+        var gravityValue = gravityCurve.Evaluate(verticalVelocity);
+        
+        // 叠加垂直矢量，重力是垂直向下的，所以需要减
+        _moveVelocity.y -= gravityValue * deltaTime;
     }
 
     void JumpCheck()
@@ -289,30 +350,28 @@ public class RigidBodyOrbitMove : MonoBehaviour
         // 没按跳跃无法起跳
         if(!jumpInput)return;
 
-        // 更换了新的实现方案，操作上只接管xz，y轴直接由rigidbody管控
-        // _VectorY += _JumpForce;
-
         var velocity = _rigidBody.velocity;
         velocity = new Vector3(velocity.x, JumpForce, velocity.z);
         
         _rigidBody.velocity = velocity;
     }
 
-    /// <summary>
-    /// 保底处理
-    /// </summary>
-    void VectorLimitCheck(ref float vectorValue, float maxValue)
+    void Vector2LimitCheck(ref Vector2 vectorValue, float xMax, float yMax)
     {
-        var maxValueAbs = Mathf.Abs(maxValue);
-        
-        if (maxValueAbs < vectorValue)
+        // 取最大值的绝对值
+        var maxXValueAbs = Mathf.Abs(xMax);
+        var maxYValueAbs = Mathf.Abs(yMax);
+
+        // 如果 x 分量的绝对值超过最大值，则限制它
+        if (Mathf.Abs(vectorValue.x) > maxXValueAbs)
         {
-            vectorValue = maxValueAbs;
+            vectorValue.x = Mathf.Sign(vectorValue.x) * maxXValueAbs;
         }
 
-        if (vectorValue < -maxValueAbs)
+        // 如果 y 分量的绝对值超过最大值，则限制它
+        if (Mathf.Abs(vectorValue.y) > maxYValueAbs)
         {
-            vectorValue = -maxValueAbs;
+            vectorValue.y = Mathf.Sign(vectorValue.y) * maxYValueAbs;
         }
     }
     
@@ -337,7 +396,7 @@ public class RigidBodyOrbitMove : MonoBehaviour
 
     public Vector2 GetVelocity()
     {
-        return new Vector2(_velocity.x, _velocity.y);
+        return new Vector2(_moveVelocity.x, _moveVelocity.y);
     }
 
     /// <summary>
@@ -345,7 +404,7 @@ public class RigidBodyOrbitMove : MonoBehaviour
     /// </summary>
     public void SetVelocity(Vector2 v2)
     {
-        _velocity = v2;
+        _moveVelocity = v2;
     }
 
     public void SetEnvironmentVelocity(Vector2 v2)
@@ -372,7 +431,7 @@ public class RigidBodyOrbitMove : MonoBehaviour
     {
         _forceTranslateNextFixedUpdate = true;
         _forceTranslatePosition = position;
-        _velocity = vector;
+        _moveVelocity = vector;
     }
 
 
@@ -459,4 +518,6 @@ public class RigidBodyOrbitMove : MonoBehaviour
     }
 
     #endregion
+
+
 }

@@ -4,7 +4,6 @@
  * Description: 触发NPC对话
  */
 
-using Basic.Defines;
 using Module.EventManager;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ public class InteractiveNPC : IInteractiveUnit
 {
     public string roleName;
     
-    public override void Interact()
+    public override void Interact(RigidBodyOrbitMove _)
     {
         // 触发对话系统与哪个角色对话
         Debug.Log($"[{nameof(InteractiveNPC)}]Interact with {roleName}");

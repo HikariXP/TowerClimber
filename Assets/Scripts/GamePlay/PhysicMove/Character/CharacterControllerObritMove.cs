@@ -126,7 +126,7 @@ public class CharacterControllerObritMove : MonoBehaviour
         _VectorX = Math.Clamp(_VectorX, -HorizionalVelocityMax, HorizionalVelocityMax);
         _VectorY = Math.Clamp(_VectorY, -VerticalVelocityMax, VerticalVelocityMax);
         
-        Vector3 tempMovement = ObritMovementHelper.GetHorizontalMovement(_transform.position, _VectorX, _ObritRadius, Time.deltaTime);
+        Vector3 tempMovement = OrbitMovementHelper.GetHorizontalMovement(_transform.position, _VectorX, _ObritRadius, Time.deltaTime);
         float tempVertical = GetVerticalMovement();
         Vector3 resultMovement = new Vector3(tempMovement.x, tempVertical, tempMovement.z);
 
@@ -180,7 +180,7 @@ public class CharacterControllerObritMove : MonoBehaviour
     private void ForceTranslate()
     {
         // 进行一次刷新
-        _forceTranslatePosition = ObritMovementHelper.GetPositionOnCircle(_forceTranslatePosition, _ObritRadius);
+        _forceTranslatePosition = OrbitMovementHelper.GetPositionOnCircle(_forceTranslatePosition, _ObritRadius);
         _characterController.transform.position = _forceTranslatePosition;
     }
 

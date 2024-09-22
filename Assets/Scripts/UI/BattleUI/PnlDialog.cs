@@ -4,7 +4,6 @@
  * Description: 对话系统的UI控制，包括输入监听以及内容显示
  */
 
-using System;
 using System.Collections.Generic;
 using Basic.Interface;
 using Dialog;
@@ -66,11 +65,8 @@ namespace UI.BattleUI
                 return;
             }
             
-            // TODO:角色名字显示还没做
             var text = Localization.LocalizationManager.GetLocalization("role_lalako",dialog.dialogContentKey);
             txtDialogText.text = text;
         }
-
-
     }
 }

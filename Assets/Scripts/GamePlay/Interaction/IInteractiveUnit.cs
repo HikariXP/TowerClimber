@@ -14,7 +14,7 @@ public abstract class IInteractiveUnit : MonoBehaviour, IComparable<IInteractive
     /// </summary>
     [Header("InteractSetting")]
     public uint priority;
-
+    
     /// <summary>
     /// 是否可以重复互动
     /// </summary>
@@ -30,15 +30,31 @@ public abstract class IInteractiveUnit : MonoBehaviour, IComparable<IInteractive
     /// </summary>
     public bool haveInteract;
 
+    public Transform _model;
+
+    public Transform _trigger;
+    
+    /// <summary>
+    /// 互动需要指定约束的事件Id
+    /// </summary>
+    // public int limitedEventIndex;
+
     public virtual void Init(uint newPriority)
     {
         priority = newPriority;
     }
+    
+    public virtual void Init(float towerRadius)
+    {
+        // _model.transform.position = new Vector3(0, 0, towerRadius);
+        // _trigger.transform.position = new Vector3(0, 0, towerRadius);
+    }
 
     /// <summary>
     /// 抽象互动接口
+    /// TODO：由于跳板需要用到角色的控制，所以加了这个。但后续发布生产的时候，要将这个拆离，改为触发互动事件。事件的处理在别的地方继续用
     /// </summary>
-    public abstract void Interact();
+    public abstract void Interact(RigidBodyOrbitMove targetObject);
 
     protected bool CanInteract()
     {

@@ -28,8 +28,8 @@ namespace GamePlay.PhysicMove
         {
             var position = _transform.position;
         
-            var tempMovement = ObritMovementHelper.GetHorizontalMovement(position, speed, orbitRadius, Time.fixedDeltaTime);
-            var tempRotation = ObritMovementHelper.GetQuaternionLockToTarget(position,Vector3.zero);
+            var tempMovement = OrbitMovementHelper.GetHorizontalMovement(position, speed, orbitRadius, Time.fixedDeltaTime);
+            var tempRotation = OrbitMovementHelper.GetQuaternionLockToTarget(position,Vector3.zero);
 
             _rigidbody.MovePosition(tempMovement);
             _rigidbody.MoveRotation(tempRotation);

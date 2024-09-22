@@ -9,6 +9,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Obsolete]
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerRigidBodyObritMove : MonoBehaviour
 {
@@ -20,6 +21,8 @@ public class PlayerRigidBodyObritMove : MonoBehaviour
     public bool jumpInput;
 
     private Rigidbody _RigidBody;
+
+    
 
     /// <summary>
     /// 塔的半径
@@ -92,7 +95,9 @@ public class PlayerRigidBodyObritMove : MonoBehaviour
         // 输入检测
         // 测试用
         _VectorX = moveInput;
-        
+
+
+
         // 着地检测。跟置于脚下的碰撞体不一样，简化后的碰撞检测
         GroundCheck(GroundRadius,GroundOffset);
         
@@ -103,6 +108,10 @@ public class PlayerRigidBodyObritMove : MonoBehaviour
         Vector3 originHorizontalMovement = GetHorizontalMovement(_VectorX, _ObritRadius, 1);
 
         var inverseHorizontalMovement = transform.InverseTransformPoint(originHorizontalMovement);
+        
+        
+
+        
 
         var result = new Vector3(inverseHorizontalMovement.x, _RigidBody.velocity.y, inverseHorizontalMovement.z);
         

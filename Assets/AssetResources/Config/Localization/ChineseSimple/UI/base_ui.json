@@ -13,5 +13,20 @@
         "key" : "button_No",
         "text" : "不是",
         "text_eng" : "no"
+    },
+    {
+        "key" : "start_game",
+        "text" : "新的旅程",
+        "text_eng" : "start game"
+    },
+    {
+        "key" : "continue",
+        "text" : "继续旅途",
+        "text_eng" : "continue game"
+    },
+    {
+        "key" : "settings",
+        "text" : "设置",
+        "text_eng" : "settings"
     }
 ]
